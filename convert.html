@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Konversi Waktu UTC ke WIB</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --bg-color-light: #f0f0f0;
+      --text-color-light: #222;
+      --card-bg-light: #fff;
+
+      --bg-color-dark: #121212;
+      --text-color-dark: #f0f0f0;
+      --card-bg-dark: #1e1e1e;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color-dark);
+      color: var(--text-color-dark);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container-box {
+      max-width: 400px;
+      margin: 140px auto 60px;
+      background-color: var(--card-bg-dark);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    .result {
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      color: #4CAF50;
+    }
+
+    .light-theme {
+      background-color: var(--bg-color-light);
+      color: var(--text-color-light);
+    }
+
+    .light-theme .container-box {
+      background-color: var(--card-bg-light);
+      color: var(--text-color-light);
+    }
+
+    .theme-toggle-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: inherit;
+      transition: transform 0.3s;
+    }
+
+    .theme-toggle-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .navbar-brand img {
+      margin-right: 10px;
+    }
+
+    .form-control, .form-select {
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar Responsif -->
+  <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="logo1.png" alt="Logo" width="40" height="40" class="rounded-circle">
+        <span class="ms-2 fw-semibold">Timeless</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
+          <li class="nav-item"><a class="nav-link" href="home.html">Kalkulator</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+          <li class="nav-item ms-3">
+            <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeIcon">🌙</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Kontainer Konversi -->
+  <div class="container-box">
+    <h2>Konversi UTC ke WIB</h2>
+    <label for="utc-time" class="form-label">Waktu (UTC):</label>
+    <input type="time" id="utc-time" class="form-control" />
+
+    <label for="utc-offset" class="form-label">Offset UTC:</label>
+    <select id="utc-offset" class="form-select">
+      <option value="0">UTC+0</option>
+      <option value="1">UTC+1</option>
+      <option value="2">UTC+2</option>
+      <option value="3">UTC+3</option>
+      <option value="4">UTC+4</option>
+      <option value="5">UTC+5</option>
+      <option value="6">UTC+6</option>
+      <option value="7" selected>UTC+7 (WIB)</option>
+      <option value="8">UTC+8</option>
+      <option value="9">UTC+9</option>
+    </select>
+
+    <button onclick="convertToWIB()" class="btn btn-primary w-100">Konversi ke WIB</button>
+    <div class="result" id="result">--:-- WIB</div>
+  </div>
+
+  <!-- Script -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function convertToWIB() {
+      const time = document.getElementById('utc-time').value;
+      const offset = parseInt(document.getElementById('utc-offset').value);
+
+      if (!time) return alert("Silakan masukkan waktu UTC.");
+
+      const [hours, minutes] = time.split(":").map(Number);
+      const utcDate = new Date();
+      utcDate.setUTCHours(hours - offset, minutes);
+
+      const wibDate = new Date(utcDate.getTime() + (7 * 60 * 60 * 1000));
+      const wibHours = String(wibDate.getHours()).padStart(2, '0');
+      const wibMinutes = String(wibDate.getMinutes()).padStart(2, '0');
+
+      document.getElementById('result').textContent = `${wibHours}:${wibMinutes} WIB`;
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const icon = document.getElementById('themeIcon');
+      const navbar = document.getElementById('mainNavbar');
+      const isLight = body.classList.toggle('light-theme');
+      icon.textContent = isLight ? '🌞' : '🌙';
+
+      if (isLight) {
+        navbar.classList.remove('bg-dark', 'navbar-dark');
+        navbar.classList.add('bg-light', 'navbar-light');
+      } else {
+        navbar.classList.remove('bg-light', 'navbar-light');
+        navbar.classList.add('bg-dark', 'navbar-dark');
+      }
+    }
+
+    // Set navbar sesuai tema saat pertama kali dimuat
+    window.onload = () => {
+      const navbar = document.getElementById('mainNavbar');
+      const icon = document.getElementById('themeIcon');
+      const isLight = document.body.classList.contains('light-theme');
+
+      if (isLight) {
+        navbar.classList.add('bg-light', 'navbar-light');
+        navbar.classList.remove('bg-dark', 'navbar-dark');
+        icon.textContent = '🌞';
+      } else {
+        navbar.classList.add('bg-dark', 'navbar-dark');
+        navbar.classList.remove('bg-light', 'navbar-light');
+        icon.textContent = '🌙';
+      }
+    };
+  </script>
+</body>
+</html>

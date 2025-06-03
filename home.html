@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hitung Waktu Tambahan</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -14,13 +14,6 @@
       transition: background 0.5s, color 0.5s;
       background: linear-gradient(to right, #74ebd5, #acb6e5);
       color: #000;
-    }
-
-    .navbar {
-      background-color: #ffffffcc;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      transition: background 0.4s, color 0.4s;
     }
 
     .card {
@@ -47,19 +40,6 @@
     body.dark-mode {
       background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
       color: #ffffff;
-    }
-
-    body.dark-mode .navbar {
-      background-color: #1a1a1aee;
-      color: #ffffff;
-    }
-
-    body.dark-mode .navbar .nav-link {
-      color: #ffffff !important;
-    }
-
-    body.dark-mode .navbar .nav-link:hover {
-      color: #cccccc !important;
     }
 
     body.dark-mode .card {
@@ -90,11 +70,6 @@
       background-color: #005bb5;
     }
 
-    body.dark-mode .card hr {
-      border-top: 1px solid #666;
-    }
-
-    /* Toggle switch custom */
     .theme-toggle {
       width: 70px;
       height: 35px;
@@ -152,8 +127,8 @@
   </style>
 </head>
 <body>
-  <!-- Navigasi -->
-  <nav class="navbar navbar-expand-lg fixed-top">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
     <div class="container">
       <a class="navbar-brand fw-bold d-flex align-items-center" href="home.html">
         <img src="logo1.png" alt="Logo" width="40" height="40" class="me-2 rounded-circle">
@@ -168,10 +143,12 @@
             <a class="nav-link" href="index.html">Beranda</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href="convert.html">Convert</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="about.html">About</a>
           </li>
           <li class="nav-item ms-3">
-            <!-- Tombol Toggle -->
             <div class="theme-toggle" onclick="toggleMode()">
               <div class="toggle-thumb" id="toggleThumb"></div>
             </div>
@@ -185,26 +162,26 @@
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-6">
-        <div class="card p-4">
-          <h3 class="text-center mb-4">🕒 Kalkulator Waktu</h3>
+        <div class="card p-4 mt-5">
+          <h3 class="text-center mb-4">⏰ Hitung Waktu Tambahan</h3>
           <div class="mb-3">
             <label for="startTime" class="form-label">Waktu Sekarang (WIB)</label>
-            <input type="time" class="form-control" id="startTime">
+            <input type="time" class="form-control" id="startTime" />
           </div>
           <div class="row mb-3">
             <div class="col">
               <label for="hours" class="form-label">Tambahkan Jam</label>
-              <input type="number" class="form-control" id="hours" min="0" value="0">
+              <input type="number" class="form-control" id="hours" min="0" value="0" />
             </div>
             <div class="col">
               <label for="minutes" class="form-label">Tambahkan Menit</label>
-              <input type="number" class="form-control" id="minutes" min="0" max="59" value="0">
+              <input type="number" class="form-control" id="minutes" min="0" max="59" value="0" />
             </div>
           </div>
           <div class="d-grid">
             <button class="btn btn-primary" onclick="hitungWaktu()">Hitung Waktu</button>
           </div>
-          <hr>
+          <hr />
           <div class="text-center">
             <h5>Hasil:</h5>
             <p id="result" class="result-text text-success fw-bold">--:-- WIB</p>
@@ -218,7 +195,19 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Saat halaman dimuat
+    function updateNavbarTheme() {
+      const navbar = document.getElementById("mainNavbar");
+      const isDark = document.body.classList.contains("dark-mode");
+
+      navbar.classList.remove("navbar-light", "bg-light", "navbar-dark", "bg-dark");
+
+      if (isDark) {
+        navbar.classList.add("navbar-dark", "bg-dark");
+      } else {
+        navbar.classList.add("navbar-light", "bg-light");
+      }
+    }
+
     window.onload = function () {
       const now = new Date();
       const jam = now.getHours().toString().padStart(2, '0');
@@ -230,6 +219,8 @@
         document.body.classList.add("dark-mode");
         document.getElementById("toggleThumb").style.transform = "translateX(35px)";
       }
+
+      updateNavbarTheme();
     };
 
     function hitungWaktu() {
@@ -262,11 +253,9 @@
       localStorage.setItem("dark-mode", isDark);
 
       const toggleThumb = document.getElementById("toggleThumb");
-      if (isDark) {
-        toggleThumb.style.transform = "translateX(35px)";
-      } else {
-        toggleThumb.style.transform = "translateX(0)";
-      }
+      toggleThumb.style.transform = isDark ? "translateX(35px)" : "translateX(0)";
+
+      updateNavbarTheme();
     }
   </script>
 </body>
