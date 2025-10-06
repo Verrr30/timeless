@@ -1,268 +1,282 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hitung Waktu Tambahan</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      min-height: 100vh;
-      padding-top: 80px;
-      transition: background 0.5s, color 0.5s;
-      background: linear-gradient(to right, #74ebd5, #acb6e5);
-      color: #000;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hitung Waktu Tambahan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            padding-top: 80px;
+            transition: background 0.5s, color 0.5s;
+            background: linear-gradient(to right, #74ebd5, #acb6e5);
+            color: #000;
+        }
 
-    .card {
-      border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      background-color: #ffffff;
-      color: #000;
-      transition: background 0.4s, color 0.4s;
-    }
+        .card {
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            background-color: #ffffff;
+            color: #000;
+            transition: background 0.4s, color 0.4s;
+            border: none;
+        }
 
-    .form-label {
-      transition: color 0.3s;
-    }
+        .form-label {
+            transition: color 0.3s;
+        }
 
-    .form-control {
-      transition: background 0.3s, color 0.3s, border 0.3s;
-    }
+        .form-control {
+            transition: background 0.3s, color 0.3s, border 0.3s;
+        }
 
-    .result-text {
-      font-size: 1.5rem;
-    }
+        .result-text {
+            font-size: 1.5rem;
+        }
+        
+        .navbar {
+             transition: background-color 0.4s !important;
+        }
 
-    /* DARK MODE STYLES */
-    body.dark-mode {
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: #ffffff;
-    }
+        /* DARK MODE STYLES */
+        body.dark-mode {
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            color: #ffffff;
+        }
 
-    body.dark-mode .card {
-      background-color: #2c2c2c;
-      color: #ffffff;
-    }
+        body.dark-mode .card {
+            background-color: #2c2c2c;
+            color: #ffffff;
+        }
 
-    body.dark-mode .form-label {
-      color: #dddddd;
-    }
+        body.dark-mode .form-label {
+            color: #dddddd;
+        }
 
-    body.dark-mode .form-control {
-      background-color: #444;
-      color: #fff;
-      border: 1px solid #666;
-    }
+        body.dark-mode .form-control {
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #666;
+        }
 
-    body.dark-mode .form-control::placeholder {
-      color: #aaa;
-    }
+        body.dark-mode .form-control::placeholder {
+            color: #aaa;
+        }
 
-    body.dark-mode .btn-primary {
-      background-color: #0066cc;
-      border-color: #0066cc;
-    }
+        body.dark-mode .btn-primary {
+            background-color: #0066cc;
+            border-color: #0066cc;
+        }
 
-    body.dark-mode .btn-primary:hover {
-      background-color: #005bb5;
-    }
+        body.dark-mode .btn-primary:hover {
+            background-color: #005bb5;
+        }
 
-    .theme-toggle {
-      width: 70px;
-      height: 35px;
-      border-radius: 20px;
-      background: linear-gradient(to right, #f5f5dc, #87ceeb);
-      position: relative;
-      cursor: pointer;
-      transition: background 0.4s;
-      display: flex;
-      align-items: center;
-      padding: 3px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
+        .theme-toggle {
+            width: 70px;
+            height: 35px;
+            border-radius: 20px;
+            background: linear-gradient(to right, #f5f5dc, #87ceeb);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.4s;
+            display: flex;
+            align-items: center;
+            padding: 3px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
 
-    .theme-toggle::before {
-      content: "🌞";
-      position: absolute;
-      left: 10px;
-      font-size: 16px;
-      transition: opacity 0.3s;
-    }
+        .theme-toggle::before {
+            content: "🌞";
+            position: absolute;
+            left: 10px;
+            font-size: 16px;
+            transition: opacity 0.3s;
+        }
 
-    .theme-toggle::after {
-      content: "🌙";
-      position: absolute;
-      right: 10px;
-      font-size: 16px;
-      opacity: 0.5;
-      transition: opacity 0.3s;
-    }
+        .theme-toggle::after {
+            content: "🌙";
+            position: absolute;
+            right: 10px;
+            font-size: 16px;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
 
-    .toggle-thumb {
-      width: 30px;
-      height: 30px;
-      background-color: white;
-      border-radius: 50%;
-      transition: transform 0.4s;
-    }
+        .toggle-thumb {
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.4s ease-in-out;
+        }
 
-    body.dark-mode .theme-toggle {
-      background: linear-gradient(to right, #111, #333);
-    }
+        body.dark-mode .theme-toggle {
+            background: linear-gradient(to right, #111, #333);
+        }
 
-    body.dark-mode .theme-toggle::before {
-      opacity: 0.5;
-    }
+        body.dark-mode .theme-toggle::before {
+            opacity: 0.5;
+        }
 
-    body.dark-mode .theme-toggle::after {
-      opacity: 1;
-    }
+        body.dark-mode .theme-toggle::after {
+            opacity: 1;
+        }
 
-    body.dark-mode .toggle-thumb {
-      transform: translateX(35px);
-    }
-  </style>
+        body.dark-mode .toggle-thumb {
+            transform: translateX(35px);
+        }
+    </style>
 </head>
-<body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
-    <div class="container">
-      <a class="navbar-brand fw-bold d-flex align-items-center" href="home.html">
-        <img src="logo1.png" alt="Logo" width="40" height="40" class="me-2 rounded-circle">
-        Timeless
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html">Beranda</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="convert.html">Convert</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="about.html">About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="day-difference.html">Daydif</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="stiker.html">Stiker</a>
-          </li>
-          <li class="nav-item ms-3">
-            <div class="theme-toggle" onclick="toggleMode()">
-              <div class="toggle-thumb" id="toggleThumb"></div>
+<body class="">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Timeless
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Convert</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Daydif</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Stiker</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <div class="theme-toggle" onclick="toggleMode()">
+                            <div class="toggle-thumb" id="toggleThumb"></div>
+                        </div>
+                    </li>
+                </ul>
             </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Kalkulator Waktu -->
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card p-4 mt-5">
-          <h3 class="text-center mb-4">⏰ Hitung Waktu Tambahan</h3>
-          <div class="mb-3">
-            <label for="startTime" class="form-label">Waktu Sekarang (WIB)</label>
-            <input type="time" class="form-control" id="startTime" />
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-              <label for="hours" class="form-label">Tambahkan Jam</label>
-              <input type="number" class="form-control" id="hours" min="0" value="0" />
-            </div>
-            <div class="col">
-              <label for="minutes" class="form-label">Tambahkan Menit</label>
-              <input type="number" class="form-control" id="minutes" min="0" max="59" value="0" />
-            </div>
-          </div>
-          <div class="d-grid">
-            <button class="btn btn-primary" onclick="hitungWaktu()">Hitung Waktu</button>
-          </div>
-          <hr />
-          <div class="text-center">
-            <h5>Hasil:</h5>
-            <p id="result" class="result-text text-success fw-bold">--:-- WIB</p>
-          </div>
         </div>
-      </div>
+    </nav>
+
+    <!-- Kalkulator Waktu -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card p-4 mt-5">
+                    <h3 class="text-center mb-4">⏰ Hitung Waktu Tambahan</h3>
+                    <div class="mb-3">
+                        <label for="startTime" class="form-label">Waktu Sekarang (WIB)</label>
+                        <input type="time" class="form-control" id="startTime" />
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="hours" class="form-label">Tambahkan Jam</label>
+                            <input type="number" class="form-control" id="hours" min="0" value="0" />
+                        </div>
+                        <div class="col">
+                            <label for="minutes" class="form-label">Tambahkan Menit</label>
+                            <input type="number" class="form-control" id="minutes" min="0" max="59" value="0" />
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-primary" onclick="hitungWaktu()">Hitung Waktu</button>
+                    </div>
+                    <div id="error-message" class="text-danger text-center mt-3 fw-bold" style="display: none;"></div>
+                    <hr />
+                    <div class="text-center">
+                        <h5>Hasil:</h5>
+                        <p id="result" class="result-text text-success fw-bold">--:-- WIB</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <script>
-    function updateNavbarTheme() {
-      const navbar = document.getElementById("mainNavbar");
-      const isDark = document.body.classList.contains("dark-mode");
+    <script>
+        const mainNavbar = document.getElementById("mainNavbar");
+        const toggleThumb = document.getElementById("toggleThumb");
+        const startTimeInput = document.getElementById('startTime');
+        const hoursInput = document.getElementById('hours');
+        const minutesInput = document.getElementById('minutes');
+        const resultEl = document.getElementById("result");
+        const errorMessageEl = document.getElementById("error-message");
 
-      navbar.classList.remove("navbar-light", "bg-light", "navbar-dark", "bg-dark");
+        function updateNavbarTheme() {
+            const isDark = document.body.classList.contains("dark-mode");
+            mainNavbar.classList.remove("navbar-light", "bg-light", "navbar-dark", "bg-dark");
+            if (isDark) {
+                mainNavbar.classList.add("navbar-dark", "bg-dark");
+            } else {
+                mainNavbar.classList.add("navbar-light", "bg-light");
+            }
+        }
 
-      if (isDark) {
-        navbar.classList.add("navbar-dark", "bg-dark");
-      } else {
-        navbar.classList.add("navbar-light", "bg-light");
-      }
-    }
+        function hitungWaktu() {
+            const startTime = startTimeInput.value;
+            const hours = parseInt(hoursInput.value) || 0;
+            const minutes = parseInt(minutesInput.value) || 0;
 
-    window.onload = function () {
-      const now = new Date();
-      const jam = now.getHours().toString().padStart(2, '0');
-      const menit = now.getMinutes().toString().padStart(2, '0');
-      document.getElementById('startTime').value = `${jam}:${menit}`;
+            errorMessageEl.style.display = 'none'; // Sembunyikan pesan error sebelumnya
 
-      const isDark = localStorage.getItem("dark-mode") === "true";
-      if (isDark) {
-        document.body.classList.add("dark-mode");
-        document.getElementById("toggleThumb").style.transform = "translateX(35px)";
-      }
+            if (!startTime) {
+                errorMessageEl.textContent = "Mohon masukkan waktu sekarang!";
+                errorMessageEl.style.display = 'block';
+                return;
+            }
 
-      updateNavbarTheme();
-    };
+            const [startHour, startMinute] = startTime.split(":").map(Number);
+            const totalStartMinutes = startHour * 60 + startMinute;
+            const totalAddedMinutes = hours * 60 + minutes;
+            const finalTotalMinutes = totalStartMinutes + totalAddedMinutes;
 
-    function hitungWaktu() {
-      const startTime = document.getElementById('startTime').value;
-      const hours = parseInt(document.getElementById('hours').value);
-      const minutes = parseInt(document.getElementById('minutes').value);
+            const resultHour = Math.floor(finalTotalMinutes / 60) % 24;
+            const resultMinute = finalTotalMinutes % 60;
 
-      if (!startTime) {
-        alert("Mohon masukkan waktu sekarang!");
-        return;
-      }
+            const formattedHour = resultHour.toString().padStart(2, '0');
+            const formattedMinute = resultMinute.toString().padStart(2, '0');
 
-      const [startHour, startMinute] = startTime.split(":").map(Number);
-      const totalStartMinutes = startHour * 60 + startMinute;
-      const totalAddedMinutes = hours * 60 + minutes;
-      const finalTotalMinutes = totalStartMinutes + totalAddedMinutes;
+            resultEl.textContent = `${formattedHour}:${formattedMinute} WIB`;
+        }
 
-      const resultHour = Math.floor(finalTotalMinutes / 60) % 24;
-      const resultMinute = finalTotalMinutes % 60;
+        function toggleMode() {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            localStorage.setItem("dark-mode", isDark);
+            
+            toggleThumb.style.transform = isDark ? "translateX(35px)" : "translateX(0)";
+            updateNavbarTheme();
+        }
 
-      const formattedHour = resultHour.toString().padStart(2, '0');
-      const formattedMinute = resultMinute.toString().padStart(2, '0');
+        window.onload = function () {
+            // Set waktu awal
+            const now = new Date();
+            const jam = now.getHours().toString().padStart(2, '0');
+            const menit = now.getMinutes().toString().padStart(2, '0');
+            startTimeInput.value = `${jam}:${menit}`;
 
-      document.getElementById("result").textContent = `${formattedHour}:${formattedMinute} WIB`;
-    }
-
-    function toggleMode() {
-      document.body.classList.toggle("dark-mode");
-      const isDark = document.body.classList.contains("dark-mode");
-      localStorage.setItem("dark-mode", isDark);
-
-      const toggleThumb = document.getElementById("toggleThumb");
-      toggleThumb.style.transform = isDark ? "translateX(35px)" : "translateX(0)";
-
-      updateNavbarTheme();
-    }
-  </script>
+            // Cek tema dari local storage
+            const isDark = localStorage.getItem("dark-mode") === "true";
+            if (isDark) {
+                document.body.classList.add("dark-mode");
+                toggleThumb.style.transform = "translateX(35px)";
+            }
+            updateNavbarTheme();
+        };
+    </script>
 </body>
 </html>
+

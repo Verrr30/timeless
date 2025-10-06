@@ -4,13 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Selisih Hari Interaktif</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        /* Menggunakan font Inter sebagai dasar, Poppins untuk Navbar */
         body {
             font-family: 'Inter', sans-serif;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        .navbar {
+            font-family: 'Poppins', sans-serif;
         }
         /* Custom style for date input icon */
         input[type="date"]::-webkit-calendar-picker-indicator {
@@ -21,65 +30,111 @@
         input[type="date"]::-webkit-calendar-picker-indicator:hover {
             opacity: 1;
         }
+
+        /* Dark Mode adjustments for Bootstrap Navbar */
+        body.dark .navbar {
+            background-color: #212529 !important; /* Warna bg-dark bootstrap */
+        }
+        body.dark .navbar-brand,
+        body.dark .nav-link,
+        body.dark .navbar-toggler-icon {
+            color: #fff !important;
+        }
+        body.dark .navbar-toggler-icon {
+             /* Membuat ikon toggler terlihat di mode gelap */
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Tailwind Dark Mode configuration */
+        .dark .bg-white { background-color: #1f2937; }
+        .dark .bg-gray-100 { background-color: #111827; }
+        .dark .text-gray-800 { color: #f9fafb; }
+        .dark .text-gray-500 { color: #9ca3af; }
+        .dark .text-gray-700 { color: #d1d5db; }
+        .dark .border-gray-300 { border-color: #4b5563; }
+        .dark .border-indigo-500 { border-color: #818cf8; }
+
+        .theme-toggle-btn {
+            background: none;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        body.dark .theme-toggle-btn {
+            border-color: #4b5563;
+        }
+
     </style>
+    <script>
+        // Konfigurasi dark mode untuk Tailwind
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
 </head>
-<body>
+<body class="bg-gray-100">
+
     <!-- Navbar Responsif -->
-  <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="#">
-        <img src="logo1.png" alt="Logo" width="40" height="40" class="rounded-circle">
-        <span class="ms-2 fw-semibold">Timeless</span>
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
-          <li class="nav-item"><a class="nav-link" href="home.html">Kalkulator</a></li>
-          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-          <li class="nav-item"><a class="nav-link" href="stiker.html">Stiker</a></li>
-          <li class="nav-item ms-3">
-            <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeIcon">🌙</button>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</body>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <nav class="navbar navbar-expand-lg fixed-top bg-light shadow-sm" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>
+                <span class="ms-2 fw-semibold">Timeless</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#">Beranda</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Kalkulator</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Stiker</a></li>
+                    <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                        <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeIcon">🌙</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
     
+    <!-- Main Content -->
+    <div class="flex items-center justify-center min-h-screen p-4 pt-24">
+        <div class="bg-white p-8 md:p-12 rounded-2xl shadow-2xl max-w-2xl w-full text-center border-t-4 border-indigo-500">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Kalkulator Selisih Hari</h1>
+            <p class="text-gray-500 mb-8">Masukkan dua tanggal untuk menghitung perbedaannya.</p>
 
-    <div class="bg-white p-8 md:p-12 rounded-2xl shadow-2xl max-w-2xl w-full text-center border-t-4 border-indigo-500">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Kalkulator Selisih Hari</h1>
-        <p class="text-gray-500 mb-8">Masukkan dua tanggal untuk menghitung perbedaannya.</p>
-
-        <!-- Input Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div>
-                <label for="startDate" class="block text-sm font-medium text-gray-700 text-left mb-2">Tanggal Awal</label>
-                <input type="date" id="startDate" name="startDate" value="2025-10-06" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+            <!-- Input Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label for="startDate" class="block text-sm font-medium text-gray-700 text-left mb-2">Tanggal Awal</label>
+                    <input type="date" id="startDate" name="startDate" value="2025-10-06" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-transparent">
+                </div>
+                <div>
+                    <label for="targetDate" class="block text-sm font-medium text-gray-700 text-left mb-2">Tanggal Target</label>
+                    <input type="date" id="targetDate" name="targetDate" value="2025-08-29" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-transparent">
+                </div>
             </div>
-            <div>
-                <label for="targetDate" class="block text-sm font-medium text-gray-700 text-left mb-2">Tanggal Target</label>
-                <input type="date" id="targetDate" name="targetDate" value="2025-08-29" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+            
+            <button id="calculateBtn" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105 mb-8">
+                Hitung Selisih
+            </button>
+
+            <!-- Result Section -->
+            <div id="result" class="bg-indigo-600 text-white p-8 rounded-xl opacity-0 transition-opacity duration-500">
+                <h2 class="text-lg md:text-xl font-semibold mb-2">Hasil Perhitungan</h2>
+                <p class="text-4xl md:text-6xl font-extrabold" id="daysDifference">0</p>
+                <p class="mt-2 text-indigo-100" id="resultText">Silakan masukkan tanggal</p>
             </div>
         </div>
-        
-        <button id="calculateBtn" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105 mb-8">
-            Hitung Selisih
-        </button>
-
-
-        <!-- Result Section -->
-        <div id="result" class="bg-indigo-600 text-white p-8 rounded-xl opacity-0 transition-opacity duration-500">
-            <h2 class="text-lg md:text-xl font-semibold mb-2">Hasil Perhitungan</h2>
-            <p class="text-4xl md:text-6xl font-extrabold" id="daysDifference">0</p>
-            <p class="mt-2 text-indigo-100" id="resultText">Silakan masukkan tanggal</p>
-        </div>
-        
     </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         const startDateInput = document.getElementById('startDate');
@@ -88,39 +143,22 @@
         const resultDiv = document.getElementById('result');
         const daysDifferenceEl = document.getElementById('daysDifference');
         const resultTextEl = document.getElementById('resultText');
-
-        // Fungsi untuk memformat tanggal ke format Indonesia
-        const formatDate = (date) => {
-            if (!date || isNaN(date)) return '';
-            return new Intl.DateTimeFormat('id-ID', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            }).format(date);
-        };
+        const themeIcon = document.getElementById('themeIcon');
 
         const calculateDifference = () => {
             const startDateValue = startDateInput.value;
             const targetDateValue = targetDateInput.value;
 
             if (!startDateValue || !targetDateValue) {
-                // Jangan tampilkan hasil jika salah satu input kosong
                 resultDiv.classList.add('opacity-0');
                 return;
             }
 
-            // Menambahkan T00:00:00 untuk menghindari masalah zona waktu
             const startDate = new Date(startDateValue + 'T00:00:00');
             const targetDate = new Date(targetDateValue + 'T00:00:00');
-
-            // Menghitung selisih dalam milidetik
             const timeDifference = targetDate.getTime() - startDate.getTime();
-            
-            // Mengonversi milidetik ke hari
-            // Math.round digunakan untuk mendapatkan selisih hari terdekat
             const daysDifference = Math.round(timeDifference / (1000 * 60 * 60 * 24));
 
-            // Menampilkan hasil
             daysDifferenceEl.textContent = Math.abs(daysDifference);
             
             if (daysDifference < 0) {
@@ -131,19 +169,29 @@
                 resultTextEl.textContent = 'Tanggal yang Sama';
             }
             
-            // Tampilkan kotak hasil
             resultDiv.classList.remove('opacity-0');
         };
         
-        // Menambahkan event listener ke tombol
+        const toggleTheme = () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeIcon.textContent = isDark ? '🌞' : '🌙';
+        };
+
+        // Initialize theme and calculator on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark');
+                themeIcon.textContent = '🌞';
+            } else {
+                themeIcon.textContent = '🌙';
+            }
+            calculateDifference();
+        });
+
         calculateBtn.addEventListener('click', calculateDifference);
-
-        // Jalankan perhitungan saat halaman pertama kali dimuat dengan nilai default
-        document.addEventListener('DOMContentLoaded', calculateDifference);
-
     </script>
-
-
 </body>
 </html>
 

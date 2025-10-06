@@ -4,24 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pembuat Stiker AI (Gemini)</title>
-    
-    <!-- Memuat Tailwind CSS untuk styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Memuat library untuk menghapus latar belakang gambar di browser -->
-    <script type="module" src="https://unpkg.com/@imgly/background-removal/dist/browser.js"></script>
 
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Background Removal Library -->
+    <script type="module" src="https://unpkg.com/@imgly/background-removal/dist/browser.js"></script>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
-        /* Menggunakan font Inter sebagai default */
+        /* Base font settings */
         body {
             font-family: 'Inter', sans-serif;
+            transition: background-color 0.5s, color 0.5s;
         }
-
-        /* Latar belakang kotak-kotak untuk area pratinjau agar transparan terlihat jelas */
+        .navbar {
+            font-family: 'Poppins', sans-serif;
+        }
         .checkerboard {
             background-image:
                 linear-gradient(45deg, #e0e0e0 25%, transparent 25%),
@@ -31,278 +34,320 @@
             background-size: 20px 20px;
             background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
-
-        /* Animasi spinner untuk loading */
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            border-left-color: #09f;
+            border-left-color: #4f46e5; /* indigo-600 */
             animation: spin 1s ease infinite;
         }
-        
-        /* Gaya untuk tab aktif */
         .tab-active {
             background-color: #4f46e5; /* indigo-600 */
             color: white;
         }
-
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- Dark Mode Unification --- */
+        /* Navbar dark mode adjustments */
+        html.dark .navbar {
+            background-color: #212529 !important; /* Bootstrap bg-dark color */
+            border-bottom: 1px solid #343a40;
+        }
+        html.dark .navbar-brand,
+        html.dark .nav-link {
+            color: #f8f9fa !important;
+        }
+        html.dark .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        html.dark .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.7%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Tailwind dark mode is handled by 'dark' class on <html> */
+        .theme-toggle-btn {
+            background: none;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+        html.dark .theme-toggle-btn {
+            border-color: #495057;
+            color: #f8f9fa;
         }
     </style>
+    <script>
+        // Set up Tailwind to use 'class' for dark mode
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 flex items-center justify-center min-h-screen p-4 transition-colors duration-300">
+<body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
 
-    <div class="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-10 transition-colors duration-300">
-        
-        <!-- Header -->
-        <div class="text-center mb-6">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">Pembuat Stiker AI ✨</h1>
-            <p class="text-gray-600 dark:text-gray-300 mt-2">Didukung oleh Gemini. Ubah ide menjadi stiker dalam sekejap.</p>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top bg-light shadow-sm" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M12 3a6.364 6.364 0 0 0 0 18 6.364 6.364 0 0 0 0-18z"></path><path d="M12 15a3.182 3.182 0 0 0 0-6 3.182 3.182 0 0 0 0 6z"></path></svg>
+                <span class="ms-2 fw-semibold">Timeless</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#">Beranda</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Kalkulator</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#">Stiker</a></li>
+                    <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                        <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeIcon">🌙</button>
+                    </li>
+                </ul>
+            </div>
         </div>
-
-        <!-- Area utama aplikasi -->
-        <div id="app-container">
-
-            <!-- Navigasi Tab -->
-            <div class="mb-6 flex justify-center bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
-                <button id="tab-image" class="tab-button tab-active w-1/2 py-2 px-4 rounded-md font-semibold transition-colors">Buat dari Gambar</button>
-                <button id="tab-text" class="tab-button w-1/2 py-2 px-4 rounded-md font-semibold transition-colors">Buat dari Teks ✨</button>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="flex items-center justify-center min-h-screen p-4 pt-24">
+        <div class="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-10 transition-colors duration-300">
+            <div class="text-center mb-6">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">Pembuat Stiker AI ✨</h1>
+                <p class="text-gray-600 dark:text-gray-300 mt-2">Didukung oleh Gemini. Ubah ide menjadi stiker dalam sekejap.</p>
             </div>
 
-            <!-- Konten Tab -->
-            <div id="tab-content">
-                <!-- 1. Halaman Awal untuk Unggah Gambar -->
-                <div id="image-creator-screen">
-                    <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 md:p-12 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                            <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                <span>Pilih gambar</span>
-                                <input id="file-upload" name="file-upload" type="file" class="sr-only" accept="image/png, image/jpeg, image/webp">
-                            </label>
-                            atau seret dan letakkan di sini.
-                        </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">PNG, JPG, WEBP hingga 10MB</p>
+            <!-- Error Message Area -->
+            <div id="error-container" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6" role="alert">
+                <strong class="font-bold">Oops!</strong>
+                <span class="block sm:inline" id="error-message"></span>
+            </div>
+
+            <div id="app-container">
+                <!-- Navigasi Tab -->
+                <div class="mb-6 flex justify-center bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
+                    <button id="tab-image" class="tab-button tab-active w-1/2 py-2 px-4 rounded-md font-semibold transition-colors">Buat dari Gambar</button>
+                    <button id="tab-text" class="tab-button w-1/2 py-2 px-4 rounded-md font-semibold transition-colors">Buat dari Teks ✨</button>
+                </div>
+
+                <div id="tab-content">
+                    <!-- Screen 1: Image Upload -->
+                    <div id="image-creator-screen">
+                        <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 md:p-12 text-center transition-colors">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                            <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                                <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
+                                    <span>Pilih gambar</span>
+                                    <input id="file-upload" name="file-upload" type="file" class="sr-only" accept="image/png, image/jpeg, image/webp">
+                                </label>
+                                atau seret dan letakkan di sini.
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">PNG, JPG, WEBP hingga 10MB</p>
+                        </div>
+                    </div>
+                    <!-- Screen 2: Text Input -->
+                    <div id="text-creator-screen" class="hidden">
+                        <div class="text-center">
+                            <textarea id="prompt-input" class="w-full p-3 border-2 border-gray-300 dark:border-gray-600 bg-transparent dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" rows="3" placeholder="Contoh: seekor anjing Corgi memakai mahkota, gaya stiker lucu"></textarea>
+                            <button id="generate-image-button" class="mt-4 w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                                Buat Stiker ✨
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 2. Halaman Buat dari Teks -->
-                <div id="text-creator-screen" class="hidden">
-                     <div class="text-center">
-                        <textarea id="prompt-input" class="w-full p-3 border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow" rows="3" placeholder="Contoh: seekor anjing Corgi memakai mahkota, gaya stiker lucu"></textarea>
-                        <button id="generate-image-button" class="mt-4 w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Buat Stiker ✨
+                <!-- Loading Screen -->
+                <div id="loading-screen" class="hidden text-center py-12">
+                    <div class="spinner mx-auto"></div>
+                    <p id="loading-text" class="mt-4 text-lg font-medium text-gray-700 dark:text-gray-300"></p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Proses ini mungkin memakan waktu beberapa detik.</p>
+                </div>
+
+                <!-- Result Screen -->
+                <div id="result-screen" class="hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                        <div class="text-center">
+                            <h3 id="original-title" class="font-semibold text-gray-700 dark:text-gray-200 mb-2"></h3>
+                            <div class="aspect-square w-full max-w-sm mx-auto bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md">
+                                <img id="original-image" src="" alt="Gambar Asli" class="w-full h-full object-contain">
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2">Hasil Stiker (512x512)</h3>
+                            <div class="aspect-square w-full max-w-sm mx-auto checkerboard rounded-lg overflow-hidden shadow-md">
+                                <img id="result-image" src="" alt="Hasil Stiker" class="w-full h-full object-contain">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="caption-container" class="mt-6 text-center">
+                        <button id="suggest-caption-button" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg">
+                            ✨ Sarankan Teks Stiker
+                        </button>
+                        <div id="caption-loading" class="hidden mt-4">
+                            <div class="spinner mx-auto" style="width:24px; height:24px;"></div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Meminta ide dari Gemini...</p>
+                        </div>
+                        <div id="caption-result" class="hidden mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-left"></div>
+                    </div>
+
+                    <div class="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
+                        <button id="download-button" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg">
+                            Unduh Stiker (.png)
+                        </button>
+                        <button id="reset-button" class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-white font-bold py-3 px-8 rounded-lg">
+                            Buat Lagi
                         </button>
                     </div>
                 </div>
-            </div>
-
-            <!-- Halaman Proses (Loading) -->
-            <div id="loading-screen" class="hidden text-center py-12">
-                <div class="spinner mx-auto"></div>
-                <p id="loading-text" class="mt-4 text-lg font-medium text-gray-700 dark:text-gray-300"></p>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Proses ini mungkin memakan waktu beberapa detik.</p>
-            </div>
-
-            <!-- Halaman Hasil -->
-            <div id="result-screen" class="hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                    <!-- Gambar Asli -->
-                    <div class="text-center">
-                        <h3 id="original-title" class="font-semibold text-gray-700 dark:text-gray-200 mb-2"></h3>
-                        <div class="aspect-square w-full max-w-sm mx-auto bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md">
-                            <img id="original-image" src="" alt="Gambar Asli" class="w-full h-full object-contain">
-                        </div>
-                    </div>
-                    <!-- Hasil Stiker -->
-                    <div class="text-center">
-                        <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2">Hasil Stiker (512x512)</h3>
-                        <div class="aspect-square w-full max-w-sm mx-auto checkerboard rounded-lg overflow-hidden shadow-md">
-                            <img id="result-image" src="" alt="Hasil Stiker" class="w-full h-full object-contain">
-                        </div>
-                    </div>
-                </div>
                 
-                <!-- Area Saran Teks -->
-                <div id="caption-container" class="mt-6 text-center">
-                    <button id="suggest-caption-button" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg transition-transform transform hover:scale-105">
-                        ✨ Sarankan Teks Stiker
-                    </button>
-                    <div id="caption-loading" class="hidden mt-4">
-                        <div class="spinner mx-auto" style="width:24px; height:24px;"></div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Meminta ide dari Gemini...</p>
-                    </div>
-                    <div id="caption-result" class="hidden mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-left"></div>
-                </div>
-
-                <!-- Tombol Aksi -->
-                <div class="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
-                    <button id="download-button" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Unduh Stiker (.png)
-                    </button>
-                    <button id="reset-button" class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
-                        Buat Lagi
-                    </button>
-                </div>
+                <canvas id="sticker-canvas" width="512" height="512" class="hidden"></canvas>
             </div>
-            
-            <canvas id="sticker-canvas" width="512" height="512" class="hidden"></canvas>
         </div>
-
     </div>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Main App Logic -->
     <script type="module">
-        // Definisikan API Key (biarkan kosong, akan diisi oleh environment)
-        const apiKey = "";
+        const apiKey = ""; 
         
-        // Elemen DOM
-        const tabImageBtn = document.getElementById('tab-image');
-        const tabTextBtn = document.getElementById('tab-text');
-        const imageCreatorScreen = document.getElementById('image-creator-screen');
-        const textCreatorScreen = document.getElementById('text-creator-screen');
-        const loadingScreen = document.getElementById('loading-screen');
-        const resultScreen = document.getElementById('result-screen');
-        const fileInput = document.getElementById('file-upload');
-        const originalImage = document.getElementById('original-image');
-        const originalTitle = document.getElementById('original-title');
-        const resultImage = document.getElementById('result-image');
-        const stickerCanvas = document.getElementById('sticker-canvas');
-        const downloadButton = document.getElementById('download-button');
-        const resetButton = document.getElementById('reset-button');
-        const promptInput = document.getElementById('prompt-input');
-        const generateImageButton = document.getElementById('generate-image-button');
-        const loadingText = document.getElementById('loading-text');
-        const suggestCaptionButton = document.getElementById('suggest-caption-button');
-        const captionContainer = document.getElementById('caption-container');
-        const captionLoading = document.getElementById('caption-loading');
-        const captionResult = document.getElementById('caption-result');
+        // DOM Elements
+        const elements = {
+            tabImageBtn: document.getElementById('tab-image'),
+            tabTextBtn: document.getElementById('tab-text'),
+            imageCreatorScreen: document.getElementById('image-creator-screen'),
+            textCreatorScreen: document.getElementById('text-creator-screen'),
+            loadingScreen: document.getElementById('loading-screen'),
+            resultScreen: document.getElementById('result-screen'),
+            fileInput: document.getElementById('file-upload'),
+            originalImage: document.getElementById('original-image'),
+            originalTitle: document.getElementById('original-title'),
+            resultImage: document.getElementById('result-image'),
+            stickerCanvas: document.getElementById('sticker-canvas'),
+            downloadButton: document.getElementById('download-button'),
+            resetButton: document.getElementById('reset-button'),
+            promptInput: document.getElementById('prompt-input'),
+            generateImageButton: document.getElementById('generate-image-button'),
+            loadingText: document.getElementById('loading-text'),
+            suggestCaptionButton: document.getElementById('suggest-caption-button'),
+            captionLoading: document.getElementById('caption-loading'),
+            captionResult: document.getElementById('caption-result'),
+            themeIcon: document.getElementById('themeIcon'),
+            errorContainer: document.getElementById('error-container'),
+            errorMessage: document.getElementById('error-message'),
+            tabContent: document.getElementById('tab-content'),
+        };
 
-        // Fungsi utilitas untuk beralih layar utama
+        function showError(message) {
+            elements.errorMessage.textContent = message;
+            elements.errorContainer.classList.remove('hidden');
+        }
+
+        function hideError() {
+            elements.errorContainer.classList.add('hidden');
+        }
+
         function showScreen(screen) {
-            document.getElementById('tab-content').classList.add('hidden');
-            loadingScreen.classList.add('hidden');
-            resultScreen.classList.add('hidden');
+            elements.tabContent.classList.add('hidden');
+            elements.loadingScreen.classList.add('hidden');
+            elements.resultScreen.classList.add('hidden');
             screen.classList.remove('hidden');
         }
 
-        // Logika Tab
-        tabImageBtn.addEventListener('click', () => switchTab('image'));
-        tabTextBtn.addEventListener('click', () => switchTab('text'));
-
         function switchTab(tabName) {
+            hideError();
             if (tabName === 'image') {
-                tabImageBtn.classList.add('tab-active');
-                tabTextBtn.classList.remove('tab-active');
-                imageCreatorScreen.classList.remove('hidden');
-                textCreatorScreen.classList.add('hidden');
+                elements.tabImageBtn.classList.add('tab-active');
+                elements.tabTextBtn.classList.remove('tab-active');
+                elements.imageCreatorScreen.classList.remove('hidden');
+                elements.textCreatorScreen.classList.add('hidden');
             } else {
-                tabTextBtn.classList.add('tab-active');
-                tabImageBtn.classList.remove('tab-active');
-                textCreatorScreen.classList.remove('hidden');
-                imageCreatorScreen.classList.add('hidden');
+                elements.tabTextBtn.classList.add('tab-active');
+                elements.tabImageBtn.classList.remove('tab-active');
+                elements.textCreatorScreen.classList.remove('hidden');
+                elements.imageCreatorScreen.classList.add('hidden');
             }
         }
 
-        // --- Alur 1: Buat dari Gambar ---
-        fileInput.addEventListener('change', (e) => processFile(e.target.files[0]));
-        imageCreatorScreen.addEventListener('dragover', (e) => { e.preventDefault(); e.target.closest('div').classList.add('bg-indigo-50'); });
-        imageCreatorScreen.addEventListener('dragleave', (e) => e.target.closest('div').classList.remove('bg-indigo-50'));
-        imageCreatorScreen.addEventListener('drop', (e) => {
-            e.preventDefault();
-            e.target.closest('div').classList.remove('bg-indigo-50');
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                processFile(e.dataTransfer.files[0]);
-            }
-        });
-
         async function processFile(file) {
+            hideError();
             if (!file || !file.type.startsWith('image/')) {
-                alert("Harap pilih file gambar.");
+                showError("Harap pilih file gambar yang valid.");
                 return;
             }
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const imageDataUrl = e.target.result;
-                originalImage.src = imageDataUrl;
-                originalTitle.textContent = 'Gambar Asli';
-                await removeBgAndDisplay(imageDataUrl);
+                elements.originalImage.src = e.target.result;
+                elements.originalTitle.textContent = 'Gambar Asli';
+                await removeBgAndDisplay(e.target.result);
             };
             reader.readAsDataURL(file);
         }
-        
-        // --- Alur 2: Buat dari Teks ---
-        generateImageButton.addEventListener('click', generateStickerFromText);
 
         async function generateStickerFromText() {
-            const userPrompt = promptInput.value.trim();
+            hideError();
+            const userPrompt = elements.promptInput.value.trim();
             if (!userPrompt) {
-                alert('Silakan masukkan deskripsi untuk stiker Anda.');
+                showError('Silakan masukkan deskripsi untuk stiker Anda.');
                 return;
             }
             
-            showScreen(loadingScreen);
-            loadingText.textContent = "Membuat gambar dengan AI...";
+            showScreen(elements.loadingScreen);
+            elements.loadingText.textContent = "Membuat gambar dengan AI...";
 
             try {
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
                 const payload = { instances: [{ prompt: userPrompt }], parameters: { "sampleCount": 1 } };
-
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status} ${await response.text()}`);
                 const result = await response.json();
                 
-                if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
-                    const base64Data = result.predictions[0].bytesBase64Encoded;
-                    const generatedImageUrl = `data:image/png;base64,${base64Data}`;
-                    
-                    originalImage.src = generatedImageUrl;
-                    originalTitle.textContent = 'Gambar Hasil AI';
+                if (result.predictions?.[0]?.bytesBase64Encoded) {
+                    const generatedImageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    elements.originalImage.src = generatedImageUrl;
+                    elements.originalTitle.textContent = 'Gambar Hasil AI';
                     await removeBgAndDisplay(generatedImageUrl);
-
                 } else {
                     throw new Error('Gagal mendapatkan gambar dari API.');
                 }
-
             } catch (error) {
                 console.error('Gagal membuat gambar dari teks:', error);
-                alert('Maaf, terjadi kesalahan saat membuat gambar. Coba dengan deskripsi lain.');
+                showError('Maaf, terjadi kesalahan saat membuat gambar. Coba dengan deskripsi lain.');
                 resetApp();
             }
         }
 
-        // --- Fungsi Inti & Umum ---
         async function removeBgAndDisplay(imageUrl) {
-            loadingText.textContent = 'Menghapus latar belakang...';
-            showScreen(loadingScreen);
+            elements.loadingText.textContent = 'Menghapus latar belakang...';
+            showScreen(elements.loadingScreen);
             try {
                 const blob = await imglyRemoveBackground(imageUrl);
                 const url = URL.createObjectURL(blob);
                 processAndDisplayResult(url);
             } catch (error) {
                 console.error('Gagal menghapus latar belakang:', error);
-                alert('Maaf, terjadi kesalahan saat memproses gambar. Coba lagi dengan gambar lain.');
+                showError('Maaf, terjadi kesalahan saat memproses gambar. Coba lagi dengan gambar lain.');
                 resetApp();
             }
         }
         
         function processAndDisplayResult(imageUrl) {
-            const ctx = stickerCanvas.getContext('2d');
+            const ctx = elements.stickerCanvas.getContext('2d');
             const img = new Image();
             img.onload = () => {
                 ctx.clearRect(0, 0, 512, 512);
@@ -312,24 +357,19 @@
                 const x = (512 - newW) / 2;
                 const y = (512 - newH) / 2;
                 ctx.drawImage(img, x, y, newW, newH);
-                resultImage.src = stickerCanvas.toDataURL('image/png');
-                showScreen(resultScreen);
+                elements.resultImage.src = elements.stickerCanvas.toDataURL('image/png');
+                showScreen(elements.resultScreen);
             };
             img.src = imageUrl;
         }
 
-        // --- Alur 3: Sarankan Teks Stiker ---
-        suggestCaptionButton.addEventListener('click', getCaptionsForImage);
-
         async function getCaptionsForImage() {
-            captionLoading.classList.remove('hidden');
-            captionResult.classList.add('hidden');
-            suggestCaptionButton.disabled = true;
-
+            elements.captionLoading.classList.remove('hidden');
+            elements.captionResult.classList.add('hidden');
+            elements.suggestCaptionButton.disabled = true;
             try {
-                const base64ImageData = resultImage.src.split(',')[1];
+                const base64ImageData = elements.resultImage.src.split(',')[1];
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                
                 const payload = {
                     contents: [{
                         parts: [
@@ -338,78 +378,82 @@
                         ]
                     }],
                 };
-
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
                 const result = await response.json();
                 const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
                 if (text) {
-                    captionResult.innerHTML = text.replace(/\n/g, '<br>');
-                    captionResult.classList.remove('hidden');
+                    elements.captionResult.innerHTML = text.replace(/\n/g, '<br>');
+                    elements.captionResult.classList.remove('hidden');
                 } else {
                     throw new Error('Tidak ada teks yang dihasilkan.');
                 }
-
             } catch(error) {
                 console.error('Gagal mendapatkan saran teks:', error);
-                captionResult.innerHTML = 'Gagal mendapatkan saran. Coba lagi nanti.';
-                captionResult.classList.remove('hidden');
+                elements.captionResult.innerHTML = 'Gagal mendapatkan saran. Coba lagi nanti.';
+                elements.captionResult.classList.remove('hidden');
             } finally {
-                captionLoading.classList.add('hidden');
-                suggestCaptionButton.disabled = false;
+                elements.captionLoading.classList.add('hidden');
+                elements.suggestCaptionButton.disabled = false;
             }
         }
 
-        // Tombol Aksi & Reset
-        downloadButton.addEventListener('click', () => {
+        function resetApp() {
+            hideError();
+            elements.fileInput.value = '';
+            elements.promptInput.value = '';
+            elements.originalImage.src = '';
+            elements.resultImage.src = '';
+            elements.captionResult.classList.add('hidden');
+            elements.captionResult.innerHTML = '';
+            showScreen(elements.tabContent);
+            switchTab('image'); // Default to image tab
+        }
+        
+        // --- Event Listeners & Initialization ---
+        elements.tabImageBtn.addEventListener('click', () => switchTab('image'));
+        elements.tabTextBtn.addEventListener('click', () => switchTab('text'));
+        elements.fileInput.addEventListener('change', (e) => processFile(e.target.files[0]));
+        const dropZone = elements.imageCreatorScreen.firstElementChild;
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('bg-indigo-50', 'dark:bg-gray-700'); });
+        dropZone.addEventListener('dragleave', (e) => dropZone.classList.remove('bg-indigo-50', 'dark:bg-gray-700'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('bg-indigo-50', 'dark:bg-gray-700');
+            if (e.dataTransfer.files?.[0]) processFile(e.dataTransfer.files[0]);
+        });
+        elements.generateImageButton.addEventListener('click', generateStickerFromText);
+        elements.suggestCaptionButton.addEventListener('click', getCaptionsForImage);
+        elements.downloadButton.addEventListener('click', () => {
             const link = document.createElement('a');
             link.download = 'stiker_ai.png';
-            link.href = stickerCanvas.toDataURL('image/png');
+            link.href = elements.stickerCanvas.toDataURL('image/png');
             link.click();
         });
-
-        resetButton.addEventListener('click', resetApp);
+        elements.resetButton.addEventListener('click', resetApp);
         
-        function resetApp() {
-            fileInput.value = '';
-            promptInput.value = '';
-            originalImage.src = '';
-            resultImage.src = '';
-            captionResult.classList.add('hidden');
-            captionResult.innerHTML = '';
-            showScreen(document.getElementById('tab-content'));
-        }
+        // --- Global Theme Toggle (used by navbar button) ---
+        window.toggleTheme = () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            elements.themeIcon.textContent = isDark ? '🌞' : '🌙';
+        };
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.documentElement.classList.add('dark');
+                elements.themeIcon.textContent = '🌞';
+            } else {
+                elements.themeIcon.textContent = '🌙';
+            }
+        });
     </script>
 </body>
-<!-- Navbar Responsif -->
-  <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="#">
-        <img src="logo1.png" alt="Logo" width="40" height="40" class="rounded-circle">
-        <span class="ms-2 fw-semibold">Timeless</span>
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
-          <li class="nav-item"><a class="nav-link" href="home.html">Kalkulator</a></li>
-          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-          <li class="nav-item"><a class="nav-link" href="day-difference.html">Daydif</a></li>
-          <li class="nav-item ms-3">
-            <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeIcon">🌙</button>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
 </html>
 
