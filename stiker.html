@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembuat Stiker AI (Gemini)</title>
+    
+    <!-- Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Memuat library untuk menghapus latar belakang gambar di browser -->
+    <script type="module" src="https://unpkg.com/@imgly/background-removal/dist/browser.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Menggunakan font Inter sebagai default */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Latar belakang kotak-kotak untuk area pratinjau agar transparan terlihat jelas */
+        .checkerboard {
+            background-image:
+                linear-gradient(45deg, #e0e0e0 25%, transparent 25%),
+                linear-gradient(-45deg, #e0e0e0 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #e0e0e0 75%),
+                linear-gradient(-45deg, transparent 75%, #e0e0e0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        /* Animasi spinner untuk loading */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s ease infinite;
+        }
+        
+        /* Gaya untuk tab aktif */
+        .tab-active {
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 flex items-center justify-center min-h-screen p-4 transition-colors duration-300">
+
+    <div class="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-10 transition-colors duration-300">
+        
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">Pembuat Stiker AI ✨</h1>
+            <p class="text-gray-600 dark:text-gray-300 mt-2">Didukung oleh Gemini. Ubah ide menjadi stiker dalam sekejap.</p>
+        </div>
+
+        <!-- Area utama aplikasi -->
+        <div id="app-container">
+
+            <!-- Navigasi Tab -->
+            <div class="mb-6 flex justify-center bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
+                <button id="tab-image" class="tab-button tab-active w-1/2 py-2 px-4 rounded-md font-semibold transition-colors">Buat dari Gambar</button>
+                <button id="tab-text" class="tab-button w-1/2 py-2 px-4 rounded-md font-semibold transition-colors">Buat dari Teks ✨</button>
+            </div>
+
+            <!-- Konten Tab -->
+            <div id="tab-content">
+                <!-- 1. Halaman Awal untuk Unggah Gambar -->
+                <div id="image-creator-screen">
+                    <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 md:p-12 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                            <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                <span>Pilih gambar</span>
+                                <input id="file-upload" name="file-upload" type="file" class="sr-only" accept="image/png, image/jpeg, image/webp">
+                            </label>
+                            atau seret dan letakkan di sini.
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">PNG, JPG, WEBP hingga 10MB</p>
+                    </div>
+                </div>
+
+                <!-- 2. Halaman Buat dari Teks -->
+                <div id="text-creator-screen" class="hidden">
+                     <div class="text-center">
+                        <textarea id="prompt-input" class="w-full p-3 border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow" rows="3" placeholder="Contoh: seekor anjing Corgi memakai mahkota, gaya stiker lucu"></textarea>
+                        <button id="generate-image-button" class="mt-4 w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Buat Stiker ✨
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Halaman Proses (Loading) -->
+            <div id="loading-screen" class="hidden text-center py-12">
+                <div class="spinner mx-auto"></div>
+                <p id="loading-text" class="mt-4 text-lg font-medium text-gray-700 dark:text-gray-300"></p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Proses ini mungkin memakan waktu beberapa detik.</p>
+            </div>
+
+            <!-- Halaman Hasil -->
+            <div id="result-screen" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <!-- Gambar Asli -->
+                    <div class="text-center">
+                        <h3 id="original-title" class="font-semibold text-gray-700 dark:text-gray-200 mb-2"></h3>
+                        <div class="aspect-square w-full max-w-sm mx-auto bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md">
+                            <img id="original-image" src="" alt="Gambar Asli" class="w-full h-full object-contain">
+                        </div>
+                    </div>
+                    <!-- Hasil Stiker -->
+                    <div class="text-center">
+                        <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2">Hasil Stiker (512x512)</h3>
+                        <div class="aspect-square w-full max-w-sm mx-auto checkerboard rounded-lg overflow-hidden shadow-md">
+                            <img id="result-image" src="" alt="Hasil Stiker" class="w-full h-full object-contain">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Area Saran Teks -->
+                <div id="caption-container" class="mt-6 text-center">
+                    <button id="suggest-caption-button" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg transition-transform transform hover:scale-105">
+                        ✨ Sarankan Teks Stiker
+                    </button>
+                    <div id="caption-loading" class="hidden mt-4">
+                        <div class="spinner mx-auto" style="width:24px; height:24px;"></div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Meminta ide dari Gemini...</p>
+                    </div>
+                    <div id="caption-result" class="hidden mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-left"></div>
+                </div>
+
+                <!-- Tombol Aksi -->
+                <div class="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <button id="download-button" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Unduh Stiker (.png)
+                    </button>
+                    <button id="reset-button" class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
+                        Buat Lagi
+                    </button>
+                </div>
+            </div>
+            
+            <canvas id="sticker-canvas" width="512" height="512" class="hidden"></canvas>
+        </div>
+
+    </div>
+
+    <script type="module">
+        // Definisikan API Key (biarkan kosong, akan diisi oleh environment)
+        const apiKey = "";
+        
+        // Elemen DOM
+        const tabImageBtn = document.getElementById('tab-image');
+        const tabTextBtn = document.getElementById('tab-text');
+        const imageCreatorScreen = document.getElementById('image-creator-screen');
+        const textCreatorScreen = document.getElementById('text-creator-screen');
+        const loadingScreen = document.getElementById('loading-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const fileInput = document.getElementById('file-upload');
+        const originalImage = document.getElementById('original-image');
+        const originalTitle = document.getElementById('original-title');
+        const resultImage = document.getElementById('result-image');
+        const stickerCanvas = document.getElementById('sticker-canvas');
+        const downloadButton = document.getElementById('download-button');
+        const resetButton = document.getElementById('reset-button');
+        const promptInput = document.getElementById('prompt-input');
+        const generateImageButton = document.getElementById('generate-image-button');
+        const loadingText = document.getElementById('loading-text');
+        const suggestCaptionButton = document.getElementById('suggest-caption-button');
+        const captionContainer = document.getElementById('caption-container');
+        const captionLoading = document.getElementById('caption-loading');
+        const captionResult = document.getElementById('caption-result');
+
+        // Fungsi utilitas untuk beralih layar utama
+        function showScreen(screen) {
+            document.getElementById('tab-content').classList.add('hidden');
+            loadingScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            screen.classList.remove('hidden');
+        }
+
+        // Logika Tab
+        tabImageBtn.addEventListener('click', () => switchTab('image'));
+        tabTextBtn.addEventListener('click', () => switchTab('text'));
+
+        function switchTab(tabName) {
+            if (tabName === 'image') {
+                tabImageBtn.classList.add('tab-active');
+                tabTextBtn.classList.remove('tab-active');
+                imageCreatorScreen.classList.remove('hidden');
+                textCreatorScreen.classList.add('hidden');
+            } else {
+                tabTextBtn.classList.add('tab-active');
+                tabImageBtn.classList.remove('tab-active');
+                textCreatorScreen.classList.remove('hidden');
+                imageCreatorScreen.classList.add('hidden');
+            }
+        }
+
+        // --- Alur 1: Buat dari Gambar ---
+        fileInput.addEventListener('change', (e) => processFile(e.target.files[0]));
+        imageCreatorScreen.addEventListener('dragover', (e) => { e.preventDefault(); e.target.closest('div').classList.add('bg-indigo-50'); });
+        imageCreatorScreen.addEventListener('dragleave', (e) => e.target.closest('div').classList.remove('bg-indigo-50'));
+        imageCreatorScreen.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.target.closest('div').classList.remove('bg-indigo-50');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                processFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        async function processFile(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert("Harap pilih file gambar.");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const imageDataUrl = e.target.result;
+                originalImage.src = imageDataUrl;
+                originalTitle.textContent = 'Gambar Asli';
+                await removeBgAndDisplay(imageDataUrl);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // --- Alur 2: Buat dari Teks ---
+        generateImageButton.addEventListener('click', generateStickerFromText);
+
+        async function generateStickerFromText() {
+            const userPrompt = promptInput.value.trim();
+            if (!userPrompt) {
+                alert('Silakan masukkan deskripsi untuk stiker Anda.');
+                return;
+            }
+            
+            showScreen(loadingScreen);
+            loadingText.textContent = "Membuat gambar dengan AI...";
+
+            try {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+                const payload = { instances: [{ prompt: userPrompt }], parameters: { "sampleCount": 1 } };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const result = await response.json();
+                
+                if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+                    const base64Data = result.predictions[0].bytesBase64Encoded;
+                    const generatedImageUrl = `data:image/png;base64,${base64Data}`;
+                    
+                    originalImage.src = generatedImageUrl;
+                    originalTitle.textContent = 'Gambar Hasil AI';
+                    await removeBgAndDisplay(generatedImageUrl);
+
+                } else {
+                    throw new Error('Gagal mendapatkan gambar dari API.');
+                }
+
+            } catch (error) {
+                console.error('Gagal membuat gambar dari teks:', error);
+                alert('Maaf, terjadi kesalahan saat membuat gambar. Coba dengan deskripsi lain.');
+                resetApp();
+            }
+        }
+
+        // --- Fungsi Inti & Umum ---
+        async function removeBgAndDisplay(imageUrl) {
+            loadingText.textContent = 'Menghapus latar belakang...';
+            showScreen(loadingScreen);
+            try {
+                const blob = await imglyRemoveBackground(imageUrl);
+                const url = URL.createObjectURL(blob);
+                processAndDisplayResult(url);
+            } catch (error) {
+                console.error('Gagal menghapus latar belakang:', error);
+                alert('Maaf, terjadi kesalahan saat memproses gambar. Coba lagi dengan gambar lain.');
+                resetApp();
+            }
+        }
+        
+        function processAndDisplayResult(imageUrl) {
+            const ctx = stickerCanvas.getContext('2d');
+            const img = new Image();
+            img.onload = () => {
+                ctx.clearRect(0, 0, 512, 512);
+                const ar = img.width / img.height;
+                const newW = ar > 1 ? 512 : 512 * ar;
+                const newH = ar > 1 ? 512 / ar : 512;
+                const x = (512 - newW) / 2;
+                const y = (512 - newH) / 2;
+                ctx.drawImage(img, x, y, newW, newH);
+                resultImage.src = stickerCanvas.toDataURL('image/png');
+                showScreen(resultScreen);
+            };
+            img.src = imageUrl;
+        }
+
+        // --- Alur 3: Sarankan Teks Stiker ---
+        suggestCaptionButton.addEventListener('click', getCaptionsForImage);
+
+        async function getCaptionsForImage() {
+            captionLoading.classList.remove('hidden');
+            captionResult.classList.add('hidden');
+            suggestCaptionButton.disabled = true;
+
+            try {
+                const base64ImageData = resultImage.src.split(',')[1];
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [{
+                        parts: [
+                            { text: "Berikan 5 ide teks atau caption pendek, lucu, dan relevan untuk stiker ini. Gunakan bahasa Indonesia gaul. Buat dalam format daftar bernomor." },
+                            { inlineData: { mimeType: "image/png", data: base64ImageData } }
+                        ]
+                    }],
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    captionResult.innerHTML = text.replace(/\n/g, '<br>');
+                    captionResult.classList.remove('hidden');
+                } else {
+                    throw new Error('Tidak ada teks yang dihasilkan.');
+                }
+
+            } catch(error) {
+                console.error('Gagal mendapatkan saran teks:', error);
+                captionResult.innerHTML = 'Gagal mendapatkan saran. Coba lagi nanti.';
+                captionResult.classList.remove('hidden');
+            } finally {
+                captionLoading.classList.add('hidden');
+                suggestCaptionButton.disabled = false;
+            }
+        }
+
+        // Tombol Aksi & Reset
+        downloadButton.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'stiker_ai.png';
+            link.href = stickerCanvas.toDataURL('image/png');
+            link.click();
+        });
+
+        resetButton.addEventListener('click', resetApp);
+        
+        function resetApp() {
+            fileInput.value = '';
+            promptInput.value = '';
+            originalImage.src = '';
+            resultImage.src = '';
+            captionResult.classList.add('hidden');
+            captionResult.innerHTML = '';
+            showScreen(document.getElementById('tab-content'));
+        }
+    </script>
+</body>
+</html>
+
